@@ -76,6 +76,7 @@ export interface Config {
     forms: Form;
     'form-submissions': FormSubmission;
     search: Search;
+    'mcp-tokens': McpToken;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -92,6 +93,7 @@ export interface Config {
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     search: SearchSelect<false> | SearchSelect<true>;
+    'mcp-tokens': McpTokensSelect<false> | McpTokensSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -809,6 +811,32 @@ export interface Search {
   createdAt: string;
 }
 /**
+ * MCP API tokens. User-linked tokens impersonate the user; service/admin tokens use scopes only.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mcp-tokens".
+ */
+export interface McpToken {
+  id: number;
+  label: string;
+  type: 'user' | 'service' | 'admin';
+  user?: (number | null) | User;
+  /**
+   * Custom scopes for this token. Leave empty to use default scopes based on token type. Format: collections:{collection}:{operation} (e.g., collections:users:read, collections:media:create) or media:upload, mcp:describe. Use collections:*:* for full access.
+   */
+  scopes?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  active?: boolean | null;
+  expiresAt?: string | null;
+  tokenHash: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs".
  */
@@ -942,6 +970,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'search';
         value: number | Search;
+      } | null)
+    | ({
+        relationTo: 'mcp-tokens';
+        value: number | McpToken;
       } | null)
     | ({
         relationTo: 'payload-jobs';
@@ -1480,6 +1512,26 @@ export interface SearchSelect<T extends boolean = true> {
         title?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mcp-tokens_select".
+ */
+export interface McpTokensSelect<T extends boolean = true> {
+  label?: T;
+  type?: T;
+  user?: T;
+  scopes?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  active?: T;
+  expiresAt?: T;
+  tokenHash?: T;
   updatedAt?: T;
   createdAt?: T;
 }

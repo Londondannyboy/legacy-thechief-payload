@@ -1,6 +1,6 @@
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
-// import { mcpPlugin } from 'payload-plugin-mcp'
+import { PayloadPluginMcp } from 'payload-plugin-mcp'
 
 import sharp from 'sharp' // sharp-import
 import path from 'path'
@@ -76,29 +76,56 @@ export default buildConfig({
       },
       token: process.env.BLOB_READ_WRITE_TOKEN || '',
     }),
-    // Temporarily disabled - MCP plugin
-    // mcpPlugin({
-    //   enabled: true,
-    //   apiKey: process.env.MCP_API_KEY || 'thechief-mcp-secret-key-2024',
-    //   collections: {
-    //     pages: {
-    //       enabled: true,
-    //       operations: ['list', 'get', 'create', 'update', 'delete'],
-    //     },
-    //     posts: {
-    //       enabled: true,
-    //       operations: ['list', 'get', 'create', 'update', 'delete'],
-    //     },
-    //     categories: {
-    //       enabled: true,
-    //       operations: ['list', 'get', 'create', 'update'],
-    //     },
-    //     media: {
-    //       enabled: true,
-    //       operations: ['list', 'get'],
-    //     },
-    //   },
-    // }),
+    // MCP Plugin with advanced configuration
+    PayloadPluginMcp({
+      apiKey: process.env.MCP_API_KEY || 'thechief-mcp-secret-key-2024',
+      collections: [
+        // Direct import for Pages and Posts with full CRUD
+        Pages,
+        Posts,
+        {
+          collection: Categories,
+          options: {
+            operations: {
+              list: true,
+              get: true,
+              create: true,
+              update: true,
+              delete: false, // No deletion for categories
+            },
+            toolPrefix: 'category',
+            description: 'content categories',
+          },
+        },
+        {
+          collection: Media,
+          options: {
+            operations: {
+              list: true,
+              get: true,
+              create: true, // Enable media upload via MCP
+              update: false,
+              delete: false,
+            },
+            toolPrefix: 'media',
+            description: 'media files and images',
+          },
+        },
+      ],
+      defaultOperations: {
+        list: true,
+        get: true,
+        create: true,
+        update: true,
+        delete: true,
+      },
+      media: {
+        enableChunking: false, // Disable chunking for Vercel deployment
+      },
+      richText: {
+        truncateInList: 200, // Truncate rich text in list responses
+      },
+    }),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
