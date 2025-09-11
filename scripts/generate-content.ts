@@ -124,9 +124,9 @@ function createRichTextContent(content: ReturnType<typeof generateDetailedConten
     children.push(
       {
         type: 'heading',
-        tag: 'h2',
+        tag: 'h2' as const,
         children: [{ text: section.heading }]
-      },
+      } as any,
       {
         type: 'paragraph',
         children: [{ text: section.content }]
