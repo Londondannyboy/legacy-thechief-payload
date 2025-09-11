@@ -23,6 +23,7 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.5",
     "@payloadcms/admin-bar": "3.55.0",
     "@payloadcms/db-vercel-postgres": "3.55.0",
     "@payloadcms/live-preview-react": "3.55.0",
@@ -50,6 +51,7 @@
     "next": "15.4.4",
     "next-sitemap": "^4.2.3",
     "payload": "3.55.0",
+    "pg": "^8.16.3",
     "prism-react-renderer": "^2.3.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
