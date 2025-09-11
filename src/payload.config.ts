@@ -1,5 +1,6 @@
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
+import { mcpPlugin } from 'payload-plugin-mcp'
 
 import sharp from 'sharp' // sharp-import
 import path from 'path'
@@ -74,6 +75,28 @@ export default buildConfig({
         media: true,
       },
       token: process.env.BLOB_READ_WRITE_TOKEN || '',
+    }),
+    mcpPlugin({
+      enabled: true,
+      apiKey: process.env.MCP_API_KEY || 'thechief-mcp-secret-key-2024',
+      collections: {
+        pages: {
+          enabled: true,
+          operations: ['list', 'get', 'create', 'update', 'delete'],
+        },
+        posts: {
+          enabled: true,
+          operations: ['list', 'get', 'create', 'update', 'delete'],
+        },
+        categories: {
+          enabled: true,
+          operations: ['list', 'get', 'create', 'update'],
+        },
+        media: {
+          enabled: true,
+          operations: ['list', 'get'],
+        },
+      },
     }),
   ],
   secret: process.env.PAYLOAD_SECRET,
