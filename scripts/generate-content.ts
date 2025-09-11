@@ -214,7 +214,7 @@ async function generateContent() {
       
     } catch (error) {
       console.error(`   ❌ Error creating content for: ${topic.title}`)
-      console.error(`      ${error.message}`)
+      console.error(`      ${error instanceof Error ? error.message : String(error)}`)
       errorCount++
     }
   }
