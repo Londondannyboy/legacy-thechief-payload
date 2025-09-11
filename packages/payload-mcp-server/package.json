@@ -1,0 +1,23 @@
+{
+  "name": "@thechief/payload-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for PayloadCMS - The Chief",
+  "main": "index.js",
+  "bin": {
+    "payload-mcp-server": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["mcp", "payload", "cms", "thechief"],
+  "author": "The Chief",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "commonjs"
+}
