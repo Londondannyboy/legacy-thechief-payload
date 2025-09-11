@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "thechief": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-sse-client",
+        "http://localhost:3000/api/plugin/mcp"
+      ],
+      "env": {
+        "SSE_SERVER_AUTH": "Bearer thechief-mcp-secret-key-2024"
+      }
+    }
+  }
+}

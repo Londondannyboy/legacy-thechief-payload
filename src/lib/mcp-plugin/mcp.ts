@@ -223,11 +223,12 @@ export const getMcpRequestHandler = (
           return
         }
         const paramsShape = buildInputZodShape(analysis, (tool as any).operation)
+        const paramsSchema = z.object(paramsShape)
 
         server.tool(
           tool.name,
           tool.description,
-          paramsShape,
+          paramsSchema,
           async (input: Record<string, unknown>) => {
             // Shallow redaction of sensitive fields
             const redacted: Record<string, unknown> = JSON.parse(JSON.stringify(input || {}))
