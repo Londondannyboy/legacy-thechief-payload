@@ -137,9 +137,13 @@ function createRichTextContent(content: ReturnType<typeof generateDetailedConten
   return {
     root: {
       type: 'root',
-      children
+      children,
+      direction: null,
+      format: '',
+      indent: 0,
+      version: 1
     }
-  }
+  } as any
 }
 
 async function generateContent() {
