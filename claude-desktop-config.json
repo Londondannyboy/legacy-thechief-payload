@@ -1,13 +1,16 @@
 {
   "mcpServers": {
-    "thechief": {
+    "payload-production": {
       "command": "npx",
       "args": [
-        "@modelcontextprotocol/server-sse-client",
-        "http://localhost:3000/api/plugin/mcp"
+        "-y",
+        "mcp-remote",
+        "https://thechief-clean.vercel.app/api/plugin/mcp",
+        "--header",
+        "Authorization: Bearer ${MCP_API_KEY}"
       ],
       "env": {
-        "SSE_SERVER_AUTH": "Bearer thechief-mcp-secret-key-2024"
+        "MCP_API_KEY": "thechief-mcp-secret-key-2024"
       }
     }
   }

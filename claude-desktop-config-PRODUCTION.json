@@ -1,0 +1,40 @@
+{
+  "mcpServers": {
+    "sanity-thechief": {
+      "command": "npx",
+      "args": ["-y", "@sanity/mcp-server@latest"],
+      "env": {
+        "SANITY_PROJECT_ID": "al3tn61d",
+        "SANITY_DATASET": "production",
+        "SANITY_API_TOKEN": "sk45nCDSXMq3d52MkdOpsPESU35guMMjWj1MiwM47iJrp75AHhmVSqJkgWHylCyolWlOqfx8uV7zIfhuR8TTtKVwjfWh48mhzjqhOxV23LiTEVNQf87qsfr247hGzMQY60jgfEmyDIF6dayoSjLPu9ybUKAHG5MWSUrmaOM56KvfYAcdu8P7",
+        "MCP_USER_ROLE": "developer"
+      }
+    },
+    "payload-thechief-local": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://localhost:3000/api/plugin/mcp",
+        "--header",
+        "Authorization: Bearer ${MCP_API_KEY}"
+      ],
+      "env": {
+        "MCP_API_KEY": "thechief-mcp-secret-key-2024"
+      }
+    },
+    "payload-thechief-production": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://thechief-payload-git-main-londondannyboys-projects.vercel.app/api/plugin/mcp",
+        "--header",
+        "Authorization: Bearer ${MCP_API_KEY}"
+      ],
+      "env": {
+        "MCP_API_KEY": "thechief-mcp-secret-key-2024"
+      }
+    }
+  }
+}

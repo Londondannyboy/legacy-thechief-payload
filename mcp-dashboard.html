@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayloadCMS MCP Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 10px; }
+        .status { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .status.connected { background: #4CAF50; color: white; }
+        .status.disconnected { background: #f44336; color: white; }
+        .tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .tool-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .tool-card h3 { color: #333; margin-bottom: 15px; }
+        button { background: #2196F3; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #1976D2; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
+        .result { background: #f5f5f5; padding: 10px; border-radius: 4px; margin-top: 10px; max-height: 200px; overflow-y: auto; }
+        .result pre { white-space: pre-wrap; word-wrap: break-word; }
+        .config { background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PayloadCMS MCP Dashboard</h1>
+            <p>Direct interface to your MCP tools</p>
+            <span id="status" class="status disconnected">Checking...</span>
+        </header>
+
+        <div class="config">
+            <strong>Configuration:</strong>
+            <input type="text" id="apiUrl" placeholder="API URL" value="http://localhost:3000/api/plugin/mcp">
+            <input type="password" id="apiKey" placeholder="API Key" value="thechief-mcp-secret-key-2024">
+            <button onclick="testConnection()">Test Connection</button>
+        </div>
+
+        <div class="tools">
+            <!-- Posts Card -->
+            <div class="tool-card">
+                <h3>📝 Posts</h3>
+                <button onclick="listPosts()">List Posts</button>
+                <button onclick="showCreatePost()">Create Post</button>
+                <div id="createPostForm" style="display:none; margin-top:10px;">
+                    <input type="text" id="postTitle" placeholder="Post Title">
+                    <textarea id="postContent" placeholder="Post Content" rows="3"></textarea>
+                    <button onclick="createPost()">Submit</button>
+                </div>
+                <div id="postsResult" class="result"></div>
+            </div>
+
+            <!-- Pages Card -->
+            <div class="tool-card">
+                <h3>📄 Pages</h3>
+                <button onclick="listPages()">List Pages</button>
+                <button onclick="showCreatePage()">Create Page</button>
+                <div id="createPageForm" style="display:none; margin-top:10px;">
+                    <input type="text" id="pageTitle" placeholder="Page Title">
+                    <textarea id="pageContent" placeholder="Page Content" rows="3"></textarea>
+                    <button onclick="createPage()">Submit</button>
+                </div>
+                <div id="pagesResult" class="result"></div>
+            </div>
+
+            <!-- Categories Card -->
+            <div class="tool-card">
+                <h3>🏷️ Categories</h3>
+                <button onclick="listCategories()">List Categories</button>
+                <button onclick="showCreateCategory()">Create Category</button>
+                <div id="createCategoryForm" style="display:none; margin-top:10px;">
+                    <input type="text" id="categoryTitle" placeholder="Category Title">
+                    <input type="text" id="categorySlug" placeholder="Slug (optional)">
+                    <button onclick="createCategory()">Submit</button>
+                </div>
+                <div id="categoriesResult" class="result"></div>
+            </div>
+
+            <!-- Media Card -->
+            <div class="tool-card">
+                <h3>🖼️ Media</h3>
+                <button onclick="listMedia()">List Media</button>
+                <div id="mediaResult" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MCP Client
+        class MCPClient {
+            constructor() {
+                this.apiUrl = document.getElementById('apiUrl').value;
+                this.apiKey = document.getElementById('apiKey').value;
+            }
+
+            async callTool(toolName, args = {}) {
+                this.apiUrl = document.getElementById('apiUrl').value;
+                this.apiKey = document.getElementById('apiKey').value;
+
+                const response = await fetch(this.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.apiKey}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json, text/event-stream'
+                    },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 1,
+                        method: 'tools/call',
+                        params: {
+                            name: toolName,
+                            arguments: args
+                        }
+                    })
+                });
+
+                const text = await response.text();
+                const lines = text.split('\n');
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        return JSON.parse(line.substring(6));
+                    }
+                }
+                return { error: 'No valid response' };
+            }
+        }
+
+        const client = new MCPClient();
+
+        // Test connection
+        async function testConnection() {
+            try {
+                const response = await fetch(document.getElementById('apiUrl').value, {
+                    headers: {
+                        'Authorization': `Bearer ${document.getElementById('apiKey').value}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    document.getElementById('status').className = 'status connected';
+                    document.getElementById('status').textContent = 'Connected';
+                } else {
+                    throw new Error('Invalid response');
+                }
+            } catch (e) {
+                document.getElementById('status').className = 'status disconnected';
+                document.getElementById('status').textContent = 'Disconnected';
+            }
+        }
+
+        // Posts functions
+        async function listPosts() {
+            const result = await client.callTool('posts_list', { limit: 5 });
+            document.getElementById('postsResult').innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+        }
+
+        function showCreatePost() {
+            document.getElementById('createPostForm').style.display = 'block';
+        }
+
+        async function createPost() {
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const result = await client.callTool('posts_create', {
+                data: { title, content, status: 'draft' }
+            });
+            document.getElementById('postsResult').innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            document.getElementById('createPostForm').style.display = 'none';
+        }
+
+        // Pages functions
+        async function listPages() {
+            const result = await client.callTool('pages_list', { limit: 5 });
+            document.getElementById('pagesResult').innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+        }
+
+        function showCreatePage() {
+            document.getElementById('createPageForm').style.display = 'block';
+        }
+
+        async function createPage() {
+            const title = document.getElementById('pageTitle').value;
+            const content = document.getElementById('pageContent').value;
+            const result = await client.callTool('pages_create', {
+                data: { title, content }
+            });
+            document.getElementById('pagesResult').innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            document.getElementById('createPageForm').style.display = 'none';
+        }
+
+        // Categories functions
+        async function listCategories() {
+            const result = await client.callTool('category_list', { limit: 10 });
+            document.getElementById('categoriesResult').innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+        }
+
+        function showCreateCategory() {
+            document.getElementById('createCategoryForm').style.display = 'block';
+        }
+
+        async function createCategory() {
+            const title = document.getElementById('categoryTitle').value;
+            const slug = document.getElementById('categorySlug').value;
+            const data = { title };
+            if (slug) data.slug = slug;
+            const result = await client.callTool('category_create', { data });
+            document.getElementById('categoriesResult').innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            document.getElementById('createCategoryForm').style.display = 'none';
+        }
+
+        // Media functions
+        async function listMedia() {
+            const result = await client.callTool('media_list', { limit: 5 });
+            document.getElementById('mediaResult').innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+        }
+
+        // Test connection on load
+        testConnection();
+    </script>
+</body>
+</html>
