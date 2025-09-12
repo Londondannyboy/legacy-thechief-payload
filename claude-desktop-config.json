@@ -5,7 +5,7 @@
       "args": [
         "-y",
         "mcp-remote",
-        "https://thechief-clean.vercel.app/api/plugin/mcp",
+        "https://thechief-payload.vercel.app/api/plugin/mcp",
         "--header",
         "Authorization: Bearer ${MCP_API_KEY}"
       ],
