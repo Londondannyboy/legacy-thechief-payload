@@ -1,0 +1,55 @@
+{
+  "comment": "Choose ONE of these configurations for your Claude Desktop",
+  
+  "option1_stdio_bridge": {
+    "mcpServers": {
+      "payload-bridge": {
+        "command": "node",
+        "args": ["/Users/dankeegan/thechief-payload/mcp-stdio-bridge.mjs"],
+        "env": {
+          "PAYLOAD_URL": "http://localhost:3000",
+          "MCP_API_KEY": "thechief-mcp-secret-key-2024"
+        }
+      }
+    }
+  },
+
+  "option2_npm_package_local": {
+    "mcpServers": {
+      "payload": {
+        "command": "node",
+        "args": ["/Users/dankeegan/thechief-payload/payload-mcp-server/index.js"],
+        "env": {
+          "PAYLOAD_URL": "http://localhost:3000",
+          "PAYLOAD_API_KEY": "thechief-mcp-secret-key-2024"
+        }
+      }
+    }
+  },
+
+  "option3_npm_package_global": {
+    "comment": "After running: npm install -g @thechief/payload-mcp-server",
+    "mcpServers": {
+      "payload": {
+        "command": "payload-mcp-server",
+        "env": {
+          "PAYLOAD_URL": "http://localhost:3000",
+          "PAYLOAD_API_KEY": "thechief-mcp-secret-key-2024"
+        }
+      }
+    }
+  },
+
+  "option4_production": {
+    "mcpServers": {
+      "payload-production": {
+        "command": "node",
+        "args": ["/Users/dankeegan/thechief-payload/mcp-stdio-bridge.mjs"],
+        "env": {
+          "PAYLOAD_URL": "https://thechief-payload-git-main-londondannyboys-projects.vercel.app",
+          "MCP_API_KEY": "thechief-mcp-secret-key-2024"
+        }
+      }
+    }
+  }
+}
